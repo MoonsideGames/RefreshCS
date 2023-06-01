@@ -717,8 +717,13 @@ namespace RefreshCS
 			uint yHeight,
 			uint uvWidth,
 			uint uvHeight,
-			IntPtr data,
-			uint dataLength
+			IntPtr yDataPtr,
+			IntPtr uDataPtr,
+			IntPtr vDataPtr,
+			uint yDataLength,
+			uint uvDataLength,
+			uint yStride,
+			uint uvStride
 		);
 
 		[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
