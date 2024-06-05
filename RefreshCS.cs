@@ -1205,4 +1205,35 @@ public unsafe static class Refresh
         nint query,
         out uint pixelCount
     );
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern byte* Refresh_Image_Load(
+        byte* bufferPtr,
+        int bufferLength,
+        out int w,
+        out int h,
+        out int len
+    );
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int Refresh_Image_Info(
+        byte* bufferPtr,
+        int bufferLength,
+        out int w,
+        out int h,
+        out int len
+    );
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Refresh_Image_Free(
+        byte* bufferPtr
+    );
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Refresh_Image_SavePNG(
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string filename,
+        byte* dataPtr,
+        int width,
+        int height
+    );
 }
