@@ -565,8 +565,8 @@ public unsafe static class Refresh
     public struct GraphicsPipelineResourceInfo
     {
         public uint SamplerCount;
-        public uint StorageBufferCount;
         public uint StorageTextureCount;
+        public uint StorageBufferCount;
         public uint UniformBufferCount;
     }
 
@@ -1151,8 +1151,8 @@ public unsafe static class Refresh
     public static extern void Refresh_WaitForFences(
         nint device,
         int waitAll, /* SDL_bool */
-        uint fenceCount,
-        nint* fences
+        nint* fences,
+        uint fenceCount
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
