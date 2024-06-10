@@ -170,14 +170,14 @@ public unsafe static class Refresh
     public enum ShaderStage
     {
         Vertex,
-        Fragment,
-        Compute
+        Fragment
     }
 
     public enum ShaderFormat
     {
         Invalid,
         SPIRV,
+		HLSL,
         DXBC,
         DXIL,
         MSL,
@@ -498,8 +498,12 @@ public unsafe static class Refresh
         public byte* Code;
         [MarshalAs(UnmanagedType.LPUTF8Str)]
         public string EntryPointName;
+		public ShaderFormat Format;
         public ShaderStage Stage;
-        public ShaderFormat Format;
+		public uint SamplerCount;
+		public uint StorageTextureCount;
+		public uint StorageBufferCount;
+		public uint UniformBufferCount;
     }
 
     public struct TextureCreateInfo
@@ -562,14 +566,6 @@ public unsafe static class Refresh
         public TextureFormat DepthStencilFormat;
     }
 
-    public struct GraphicsPipelineResourceInfo
-    {
-        public uint SamplerCount;
-        public uint StorageTextureCount;
-        public uint StorageBufferCount;
-        public uint UniformBufferCount;
-    }
-
     public struct GraphicsPipelineCreateInfo
     {
         public nint VertexShader;
@@ -580,24 +576,24 @@ public unsafe static class Refresh
         public MultisampleState MultisampleState;
         public DepthStencilState DepthStencilState;
         public GraphicsPipelineAttachmentInfo AttachmentInfo;
-        public GraphicsPipelineResourceInfo VertexResourceInfo;
-        public GraphicsPipelineResourceInfo FragmentResourceInfo;
         public fixed float BlendConstants[4];
-    }
-
-    public struct ComputePipelineResourceInfo
-    {
-        public uint ReadOnlyStorageTextureCount;
-        public uint ReadOnlyStorageBufferCount;
-        public uint ReadWriteStorageTextureCount;
-        public uint ReadWriteStorageBufferCount;
-        public uint UniformBufferCount;
     }
 
     public struct ComputePipelineCreateInfo
     {
-        public nint ComputeShader;
-        public ComputePipelineResourceInfo PipelineResourceInfo;
+		public nuint CodeSize;
+		public byte* Code;
+		[MarshalAs(UnmanagedType.LPUTF8Str)]
+		public string EntryPointName;
+		public ShaderFormat Format;
+		public uint ReadOnlyStorageTextureCount;
+		public uint ReadOnlyStorageBufferCount;
+		public uint ReadWriteStorageTextureCount;
+		public uint ReadWriteStorageBufferCount;
+		public uint UniformBufferCount;
+		public uint ThreadCountX;
+		public uint ThreadCountY;
+		public uint ThreadCountZ;
     }
 
     public struct ColorAttachmentInfo
