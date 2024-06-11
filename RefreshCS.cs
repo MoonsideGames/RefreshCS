@@ -971,7 +971,7 @@ public unsafe static class Refresh
         nint device,
         nint transferBuffer,
         int cycle, /* SDL_bool */
-        out nint ppData
+        out byte* ppData
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
