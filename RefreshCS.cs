@@ -160,11 +160,10 @@ public unsafe static class Refresh
         ComputeStorageWrite = 0x40
     }
 
-    [Flags]
-    public enum TransferBufferMapFlags
+    public enum TransferBufferUsage
     {
-        Read = 0x1,
-        Write = 0x2
+        Upload,
+        Download
     }
 
     public enum ShaderStage
@@ -302,24 +301,7 @@ public unsafe static class Refresh
     {
         Repeat,
         MirroredRepeat,
-        ClampToEdge,
-        ClampToBorder
-    }
-
-    public enum BorderColor
-    {
-        FloatTransparentBlack,
-        IntTransparentBlack,
-        FloatOpaqueBlack,
-        IntOpaqueBlack,
-        FloatOpaqueWhite,
-        IntOpaqueWhite
-    }
-
-    public enum TransferUsage
-    {
-        Buffer,
-        Texture
+        ClampToEdge
     }
 
     public enum PresentMode
@@ -381,12 +363,41 @@ public unsafe static class Refresh
         public float MaxDepth;
     }
 
+	public struct TextureTransferInfo
+	{
+		public nint TransferBuffer;
+		public uint Offset;
+		public uint ImagePitch;
+		public uint ImageHeight;
+	}
+
+	public struct TransferBufferLocation
+	{
+		public nint TransferBuffer;
+		public uint Offset;
+	}
+
+	public struct TransferBufferRegion
+	{
+		public nint TransferBuffer;
+		public uint Offset;
+		public uint Size;
+	}
+
     public struct TextureSlice
     {
         public nint Texture;
         public uint MipLevel;
         public uint Layer;
     }
+
+	public struct TextureLocation
+	{
+		public TextureSlice TextureSlice;
+		public uint X;
+		public uint Y;
+		public uint Z;
+	}
 
     public struct TextureRegion
     {
@@ -399,12 +410,18 @@ public unsafe static class Refresh
         public uint D;
     }
 
-    public struct BufferImageCopy
-    {
-        public uint BufferOffset;
-        public uint BufferStride;
-        public uint BufferImageHeight;
-    }
+	public struct BufferLocation
+	{
+		public nint Buffer;
+		public uint Offset;
+	}
+
+	public struct BufferRegion
+	{
+		public nint Buffer;
+		public uint Offset;
+		public uint Size;
+	}
 
     public struct BufferCopy
     {
@@ -445,7 +462,6 @@ public unsafe static class Refresh
 		public CompareOp CompareOp;
         public float MinLod;
         public float MaxLod;
-        public BorderColor BorderColor;
     }
 
     public struct VertexBinding
@@ -541,15 +557,12 @@ public unsafe static class Refresh
         public int DepthTestEnable; /* SDL_bool */
         public int DepthWriteEnable; /* SDL_bool */
         public CompareOp CompareOp;
-        public int DepthBoundsTestEnable; /* SDL_bool */
         public int StencilTestEnable; /* SDL_bool */
         public StencilOpState BackStencilState;
         public StencilOpState FrontStencilState;
         public uint CompareMask;
         public uint WriteMask;
         public uint Reference;
-        public float MinDepthBounds;
-        public float MaxDepthBounds;
     }
 
     public struct ColorAttachmentDescription
@@ -698,8 +711,7 @@ public unsafe static class Refresh
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint Refresh_CreateTransferBuffer(
         nint device,
-        TransferUsage usage,
-        TransferBufferMapFlags mapFlags,
+        TransferBufferUsage usage,
         uint sizeInBytes
     );
 
@@ -721,6 +733,23 @@ public unsafe static class Refresh
         nint texture,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string text
     );
+
+	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void Refresh_InsertDebugLabel(
+		nint commandBuffer,
+		[MarshalAs(UnmanagedType.LPUTF8Str)] string text
+	);
+
+	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void Refresh_PushDebugGroup(
+		nint commandBuffer,
+		[MarshalAs(UnmanagedType.LPUTF8Str)] string text
+	);
+
+	[DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void Refresh_PopDebugGroup(
+		nint commandBuffer
+	);
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_ReleaseTexture(
@@ -983,18 +1012,16 @@ public unsafe static class Refresh
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_SetTransferData(
         nint device,
-        nint data,
-        nint transferBuffer,
-        in BufferCopy copyParams,
+        nint source,
+		in TransferBufferRegion destination,
         int cycle /* SDL_bool */
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_GetTransferData(
         nint device,
-        nint transferBuffer,
-        nint data,
-        in BufferCopy copyParams
+        in TransferBufferRegion source,
+        nint destination
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1005,35 +1032,36 @@ public unsafe static class Refresh
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_UploadToTexture(
         nint copyPass,
-        nint transferBuffer,
-        in TextureRegion textureRegion,
-        in BufferImageCopy copyParams,
+        in TextureTransferInfo source,
+        in TextureRegion destination,
         int cycle /* SDL_bool */
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_UploadToBuffer(
         nint copyPass,
-        nint transferBuffer,
-        nint buffer,
-        in BufferCopy copyParams,
+        in TransferBufferLocation source,
+        in BufferRegion destination,
         int cycle /* SDL_bool */
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_CopyTextureToTexture(
         nint copyPass,
-        in TextureRegion source,
-        in TextureRegion destination,
+        in TextureLocation source,
+        in TextureLocation destination,
+		uint w,
+		uint h,
+		uint d,
         int cycle /* SDL_bool */
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_CopyBufferToBuffer(
         nint copyPass,
-        nint source,
-        nint destination,
-        in BufferCopy copyParams,
+        in BufferLocation source,
+        in BufferLocation destination,
+        uint size,
         int cycle /* SDL_bool */
     );
 
@@ -1046,17 +1074,15 @@ public unsafe static class Refresh
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_DownloadFromTexture(
         nint copyPass,
-        in TextureRegion textureRegion,
-        nint transferBuffer,
-        in BufferImageCopy copyParams
+        in TextureRegion source,
+        in TextureTransferInfo destination
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_DownloadFromBuffer(
         nint copyPass,
-        nint buffer,
-        nint transferBuffer,
-        in BufferCopy copyParams
+        in BufferRegion source,
+        in TransferBufferLocation destination
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
