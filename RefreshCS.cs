@@ -799,6 +799,36 @@ public unsafe static class Refresh
         nint query
     );
 
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern nint Refresh_AcquireCommandBuffer(
+        nint device
+    );
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Refresh_PushVertexUniformData(
+        nint commandBuffer,
+        uint slotIndex,
+        nint data,
+        uint dataLengthInBytes
+    );
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Refresh_PushFragmentUniformData(
+        nint commandBuffer,
+        uint slotIndex,
+        nint data,
+        uint dataLengthInBytes
+    );
+
+    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Refresh_PushComputeUniformData(
+        nint commandBuffer,
+        uint slotIndex,
+        nint data,
+        uint dataLengthInBytes
+    );
+
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern nint Refresh_BeginRenderPass(
         nint commandBuffer,
@@ -889,22 +919,6 @@ public unsafe static class Refresh
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void Refresh_PushVertexUniformData(
-        nint renderPass,
-        uint slotIndex,
-        nint data,
-        uint dataLengthInBytes
-    );
-
-    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void Refresh_PushFragmentUniformData(
-        nint renderPass,
-        uint slotIndex,
-        nint data,
-        uint dataLengthInBytes
-    );
-
-    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void Refresh_DrawIndexedPrimitives(
         nint renderPass,
         uint baseVertex,
@@ -972,14 +986,6 @@ public unsafe static class Refresh
         uint firstSlot,
         nint* storageBuffers,
         uint bindingCount
-    );
-
-    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void Refresh_PushComputeUniformData(
-        nint computePass,
-        uint slotIndex,
-        nint data,
-        uint dataLengthInBytes
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
@@ -1139,11 +1145,6 @@ public unsafe static class Refresh
     public static extern TextureFormat Refresh_GetSwapchainTextureFormat(
         nint device,
         nint window
-    );
-
-    [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern nint Refresh_AcquireCommandBuffer(
-        nint device
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
