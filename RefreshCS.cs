@@ -1134,7 +1134,7 @@ public unsafe static class Refresh
     );
 
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void Refresh_SetSwapchainParameters(
+    public static extern int Refresh_SetSwapchainParameters(
         nint device,
         nint window,
         SwapchainComposition swapchainComposition,
